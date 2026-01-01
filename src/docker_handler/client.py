@@ -75,7 +75,7 @@ class DockerClientWrapper:
             raise ConfigurationError(
                 "Cannot connect to Docker daemon",
                 details={"error": str(e), "base_url": self.base_url},
-            )
+            ) from e
 
     @property
     def client(self) -> _DockerClient:
@@ -99,16 +99,16 @@ class DockerClientWrapper:
         """
         try:
             return self.client.containers.get(container_id)
-        except NotFound:
+        except NotFound as e:
             raise ContainerNotFoundError(
                 f"Container not found: {container_id}",
                 details={"container_id": container_id},
-            )
+            ) from e
         except APIError as e:
             raise ContainerError(
                 f"Error retrieving container: {e}",
                 details={"container_id": container_id, "error": str(e)},
-            )
+            ) from e
 
     def list_containers(
         self, all: bool = False, filters: dict[str, Any] | None = None
@@ -126,9 +126,7 @@ class DockerClientWrapper:
         try:
             return self.client.containers.list(all=all, filters=filters)  # type: ignore[no-any-return]
         except APIError as e:
-            raise ContainerError(
-                f"Error listing containers: {e}", details={"error": str(e)}
-            )
+            raise ContainerError(f"Error listing containers: {e}", details={"error": str(e)}) from e
 
     def ping(self) -> bool:
         """
@@ -154,7 +152,7 @@ class DockerClientWrapper:
         except APIError as e:
             raise DockerHandlerError(
                 f"Error getting Docker info: {e}", details={"error": str(e)}
-            )
+            ) from e
 
     def get_version(self) -> dict[str, Any]:
         """
@@ -168,7 +166,7 @@ class DockerClientWrapper:
         except APIError as e:
             raise DockerHandlerError(
                 f"Error getting Docker version: {e}", details={"error": str(e)}
-            )
+            ) from e
 
     @contextmanager
     def handle_errors(self, operation: str) -> Generator[None, None, None]:
@@ -191,17 +189,17 @@ class DockerClientWrapper:
             raise ContainerNotFoundError(
                 f"Container not found during {operation}",
                 details={"operation": operation, "error": str(e)},
-            )
+            ) from e
         except APIError as e:
             raise ContainerError(
                 f"Docker API error during {operation}: {e}",
                 details={"operation": operation, "error": str(e)},
-            )
+            ) from e
         except DockerException as e:
             raise DockerHandlerError(
                 f"Docker error during {operation}: {e}",
                 details={"operation": operation, "error": str(e)},
-            )
+            ) from e
 
     def close(self) -> None:
         """Close connection to Docker daemon."""
