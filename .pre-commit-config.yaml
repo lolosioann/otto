@@ -1,0 +1,35 @@
+repos:
+  # Ruff: linting + formatting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.10
+    hooks:
+      - id: ruff-check
+        args: ["--fix"]
+        types_or: [python]
+      - id: ruff-format
+        types_or: [python]
+
+  # Bandit: basic security scan
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.1
+    hooks:
+      - id: bandit
+        args: ["-r", "src"]
+        exclude: "tests/"
+
+  # Interrogate: docstring coverage check
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.7.0
+    hooks:
+      - id: interrogate
+        args: ["--fail-under", "80", "src"]
+        types: [python]
+
+  # Standard pre-commit hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
