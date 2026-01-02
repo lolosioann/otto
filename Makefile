@@ -75,9 +75,19 @@ docs-strict: ## Build docs with warnings as errors
 	@echo "✓ Documentation built (strict mode)"
 
 docs-serve: docs ## Build and open documentation in browser
-	@command -v xdg-open >/dev/null 2>&1 && xdg-open docs/_build/html/index.html || \
-	command -v open >/dev/null 2>&1 && open docs/_build/html/index.html || \
-	echo "Please open docs/_build/html/index.html manually"
+	@if command -v xdg-open >/dev/null 2>&1; then \
+		xdg-open docs/_build/html/index.html 2>/dev/null & \
+	elif command -v open >/dev/null 2>&1; then \
+		open docs/_build/html/index.html; \
+	elif command -v firefox >/dev/null 2>&1; then \
+		firefox docs/_build/html/index.html 2>/dev/null & \
+	elif command -v chromium >/dev/null 2>&1; then \
+		chromium docs/_build/html/index.html 2>/dev/null & \
+	elif command -v google-chrome >/dev/null 2>&1; then \
+		google-chrome docs/_build/html/index.html 2>/dev/null & \
+	else \
+		echo "Browser not detected. Open manually: docs/_build/html/index.html"; \
+	fi
 
 docs-test: ## Test code examples in documentation
 	uv run sphinx-build -b doctest docs docs/_build/doctest
