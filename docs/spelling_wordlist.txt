@@ -16,6 +16,7 @@ mypy
 napoleon
 Otto
 pre-commit
+Pre
 py
 pytest
 pyproject
