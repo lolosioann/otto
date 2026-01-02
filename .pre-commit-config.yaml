@@ -13,20 +13,28 @@ repos:
     rev: 1.8.1
     hooks:
       - id: bandit
-        args: ["-r", "src"]
-        exclude: "tests/"
+        args: ["-c", "pyproject.toml"]
+        files: ^src/
 
   # Interrogate: docstring coverage check
   - repo: https://github.com/econchick/interrogate
     rev: 1.7.0
     hooks:
       - id: interrogate
-        args: ["--fail-under", "80", "src"]
+        args: ["-c", "pyproject.toml", "src"]
         types: [python]
+
+  # Mypy: type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        args: ["--config-file=pyproject.toml"]
+        additional_dependencies: ["docker>=7.0.0", "types-docker>=7.1.0"]
 
   # Standard pre-commit hygiene
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
