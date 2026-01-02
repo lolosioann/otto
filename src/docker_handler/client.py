@@ -82,6 +82,8 @@ class DockerClientWrapper:
         """Get the underlying Docker client."""
         if self._client is None:
             self._connect()
+        if self._client is None:
+            raise ConfigurationError("Docker client not initialized")
         return self._client
 
     def get_container(self, container_id: str) -> Container:
@@ -124,7 +126,7 @@ class DockerClientWrapper:
             List of Container objects
         """
         try:
-            return self.client.containers.list(all=all, filters=filters)  # type: ignore[no-any-return]
+            return self.client.containers.list(all=all, filters=filters)
         except APIError as e:
             raise ContainerError(f"Error listing containers: {e}", details={"error": str(e)}) from e
 
@@ -136,7 +138,7 @@ class DockerClientWrapper:
             True if daemon responds
         """
         try:
-            return self.client.ping()  # type: ignore[no-any-return]
+            return self.client.ping()
         except DockerException:
             return False
 
@@ -148,7 +150,7 @@ class DockerClientWrapper:
             System info dictionary
         """
         try:
-            return self.client.info()  # type: ignore[no-any-return]
+            return self.client.info()
         except APIError as e:
             raise DockerHandlerError(
                 f"Error getting Docker info: {e}", details={"error": str(e)}
@@ -162,7 +164,7 @@ class DockerClientWrapper:
             Version info dictionary
         """
         try:
-            return self.client.version()  # type: ignore[no-any-return]
+            return self.client.version()
         except APIError as e:
             raise DockerHandlerError(
                 f"Error getting Docker version: {e}", details={"error": str(e)}
