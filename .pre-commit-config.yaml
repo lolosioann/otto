@@ -30,7 +30,8 @@ repos:
     hooks:
       - id: mypy
         args: ["--config-file=pyproject.toml"]
-        additional_dependencies: ["docker>=7.0.0", "types-docker>=7.1.0"]
+        additional_dependencies: ["docker>=7.0.0", "types-docker>=7.1.0", "pytest>=9.0.0"]
+        files: ^src/
 
   # Standard pre-commit hygiene
   - repo: https://github.com/pre-commit/pre-commit-hooks
