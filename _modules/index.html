@@ -1,0 +1,214 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview: module code &mdash; Otto CLI 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Otto CLI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#basic-usage">Basic Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#connecting-to-docker">Connecting to Docker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#listing-containers">Listing Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#getting-container-information">Getting Container Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#docker-system-information">Docker System Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#using-context-managers">Using Context Managers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quickstart.html#error-handling">Error Handling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/error_handling.html">Error Handling Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guides/error_handling.html#exception-hierarchy">Exception Hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/error_handling.html#exception-details">Exception Details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/error_handling.html#common-scenarios">Common Scenarios</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../guides/error_handling.html#connection-failures">Connection Failures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../guides/error_handling.html#container-not-found">Container Not Found</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../guides/error_handling.html#api-errors">API Errors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/error_handling.html#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/error_handling.html#context-manager-pattern">Context Manager Pattern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/error_handling.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/context_managers.html">Context Managers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guides/context_managers.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/context_managers.html#manual-connection-management">Manual Connection Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/context_managers.html#error-handling-context">Error Handling Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/context_managers.html#nested-context-managers">Nested Context Managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/context_managers.html#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/context_managers.html#cleanup-guarantees">Cleanup Guarantees</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/context_managers.html#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/docker_handler.html">Docker Handler Module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/docker_handler.html#client-wrapper">Client Wrapper</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/docker_handler.html#docker_handler.client.DockerClientWrapper"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/docker_handler.html#docker_handler.client.DockerClientWrapper.__init__"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/docker_handler.html#docker_handler.client.DockerClientWrapper.client"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.client</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/docker_handler.html#docker_handler.client.DockerClientWrapper.get_container"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.get_container()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/docker_handler.html#docker_handler.client.DockerClientWrapper.list_containers"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.list_containers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/docker_handler.html#docker_handler.client.DockerClientWrapper.ping"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.ping()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/docker_handler.html#docker_handler.client.DockerClientWrapper.get_info"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.get_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/docker_handler.html#docker_handler.client.DockerClientWrapper.get_version"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.get_version()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/docker_handler.html#docker_handler.client.DockerClientWrapper.handle_errors"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.handle_errors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/docker_handler.html#docker_handler.client.DockerClientWrapper.close"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/docker_handler.html#docker_handler.client.DockerClientWrapper.__enter__"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.__enter__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/docker_handler.html#docker_handler.client.DockerClientWrapper.__exit__"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.__exit__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/docker_handler.html#docker_handler.client.DockerClientWrapper.__del__"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.__del__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/docker_handler.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/docker_handler.html#cross-references">Cross-references</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/exceptions.html">Exception Classes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/exceptions.html#exception-hierarchy">Exception Hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/exceptions.html#base-exception">Base Exception</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/exceptions.html#docker_handler.exceptions.DockerHandlerError"><code class="docutils literal notranslate"><span class="pre">DockerHandlerError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/exceptions.html#docker_handler.exceptions.DockerHandlerError.__init__"><code class="docutils literal notranslate"><span class="pre">DockerHandlerError.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/exceptions.html#container-exceptions">Container Exceptions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/exceptions.html#docker_handler.exceptions.ContainerError"><code class="docutils literal notranslate"><span class="pre">ContainerError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/exceptions.html#docker_handler.exceptions.ContainerNotFoundError"><code class="docutils literal notranslate"><span class="pre">ContainerNotFoundError</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/exceptions.html#configuration-exceptions">Configuration Exceptions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/exceptions.html#docker_handler.exceptions.ConfigurationError"><code class="docutils literal notranslate"><span class="pre">ConfigurationError</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/exceptions.html#usage-examples">Usage Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/exceptions.html#exception-details">Exception Details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/exceptions.html#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#documentation-guidelines">Documentation Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../contributing.html#write-more-than-docstrings">Write More Than Docstrings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../contributing.html#use-restructuredtext-features">Use reStructuredText Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#documentation-checks">Documentation Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#building-docs-locally">Building Docs Locally</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#testing-doctests">Testing Doctests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#spell-checking">Spell-Checking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#style-guide">Style Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../changelog.html#version-0-1-0-2025-01-02">Version 0.1.0 (2025-01-02)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#features">Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#api">API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../changelog.html#development">Development</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Otto CLI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Overview: module code</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>All modules for which code is available</h1>
+<ul><li><a href="docker_handler/client.html">docker_handler.client</a></li>
+<li><a href="docker_handler/exceptions.html">docker_handler.exceptions</a></li>
+</ul>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, lolosioann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

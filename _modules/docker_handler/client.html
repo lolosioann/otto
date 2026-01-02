@@ -1,0 +1,482 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>docker_handler.client &mdash; Otto CLI 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Otto CLI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick Start Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#basic-usage">Basic Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#connecting-to-docker">Connecting to Docker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#listing-containers">Listing Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#getting-container-information">Getting Container Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#docker-system-information">Docker System Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#using-context-managers">Using Context Managers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#error-handling">Error Handling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/error_handling.html">Error Handling Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../guides/error_handling.html#exception-hierarchy">Exception Hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../guides/error_handling.html#exception-details">Exception Details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../guides/error_handling.html#common-scenarios">Common Scenarios</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../guides/error_handling.html#connection-failures">Connection Failures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../guides/error_handling.html#container-not-found">Container Not Found</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../guides/error_handling.html#api-errors">API Errors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../guides/error_handling.html#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../guides/error_handling.html#context-manager-pattern">Context Manager Pattern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../guides/error_handling.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/context_managers.html">Context Managers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../guides/context_managers.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../guides/context_managers.html#manual-connection-management">Manual Connection Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../guides/context_managers.html#error-handling-context">Error Handling Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../guides/context_managers.html#nested-context-managers">Nested Context Managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../guides/context_managers.html#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../guides/context_managers.html#cleanup-guarantees">Cleanup Guarantees</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../guides/context_managers.html#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/docker_handler.html">Docker Handler Module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/docker_handler.html#client-wrapper">Client Wrapper</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.__init__"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.client"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.client</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.get_container"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.get_container()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.list_containers"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.list_containers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.ping"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.ping()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.get_info"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.get_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.get_version"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.get_version()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.handle_errors"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.handle_errors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.close"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.__enter__"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.__enter__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.__exit__"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.__exit__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.__del__"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.__del__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/docker_handler.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/docker_handler.html#cross-references">Cross-references</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/exceptions.html">Exception Classes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/exceptions.html#exception-hierarchy">Exception Hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/exceptions.html#base-exception">Base Exception</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/exceptions.html#docker_handler.exceptions.DockerHandlerError"><code class="docutils literal notranslate"><span class="pre">DockerHandlerError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/exceptions.html#docker_handler.exceptions.DockerHandlerError.__init__"><code class="docutils literal notranslate"><span class="pre">DockerHandlerError.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/exceptions.html#container-exceptions">Container Exceptions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/exceptions.html#docker_handler.exceptions.ContainerError"><code class="docutils literal notranslate"><span class="pre">ContainerError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/exceptions.html#docker_handler.exceptions.ContainerNotFoundError"><code class="docutils literal notranslate"><span class="pre">ContainerNotFoundError</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/exceptions.html#configuration-exceptions">Configuration Exceptions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/exceptions.html#docker_handler.exceptions.ConfigurationError"><code class="docutils literal notranslate"><span class="pre">ConfigurationError</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/exceptions.html#usage-examples">Usage Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/exceptions.html#exception-details">Exception Details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/exceptions.html#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#documentation-guidelines">Documentation Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#write-more-than-docstrings">Write More Than Docstrings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#use-restructuredtext-features">Use reStructuredText Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#documentation-checks">Documentation Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#building-docs-locally">Building Docs Locally</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#testing-doctests">Testing Doctests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#spell-checking">Spell-Checking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#style-guide">Style Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../changelog.html#version-0-1-0-2025-01-02">Version 0.1.0 (2025-01-02)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#features">Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#api">API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#development">Development</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Otto CLI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">docker_handler.client</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for docker_handler.client</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Docker client wrapper with connection management and error handling.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">TracebackType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">docker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">docker</span><span class="w"> </span><span class="kn">import</span> <span class="n">DockerClient</span> <span class="k">as</span> <span class="n">_DockerClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">docker.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">APIError</span><span class="p">,</span> <span class="n">DockerException</span><span class="p">,</span> <span class="n">NotFound</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">docker.models.containers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Container</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ConfigurationError</span><span class="p">,</span>
+    <span class="n">ContainerError</span><span class="p">,</span>
+    <span class="n">ContainerNotFoundError</span><span class="p">,</span>
+    <span class="n">DockerHandlerError</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DockerClientWrapper">
+<a class="viewcode-back" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DockerClientWrapper</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapper around Docker SDK client with enhanced error handling.</span>
+
+<span class="sd">    Provides connection management and error translation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_client</span><span class="p">:</span> <span class="n">_DockerClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="DockerClientWrapper.__init__">
+<a class="viewcode-back" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">base_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">tls</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize Docker client wrapper.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        base_url : str or None, optional</span>
+<span class="sd">            Docker daemon URL (default: from environment)</span>
+<span class="sd">        tls : Any or None, optional</span>
+<span class="sd">            TLS configuration</span>
+<span class="sd">        timeout : int, default=60</span>
+<span class="sd">            Request timeout in seconds</span>
+<span class="sd">        **kwargs : Any</span>
+<span class="sd">            Additional Docker client parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="n">base_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tls</span> <span class="o">=</span> <span class="n">tls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">timeout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connect</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Establish connection to Docker daemon.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="n">DockerClient</span><span class="p">(</span>
+                    <span class="n">base_url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">,</span>
+                    <span class="n">tls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tls</span><span class="p">,</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+                    <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Use environment variables or defaults</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="n">from_env</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+
+            <span class="c1"># Verify connection</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">ping</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connected to Docker daemon at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">DockerException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to connect to Docker daemon: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ConfigurationError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot connect to Docker daemon&quot;</span><span class="p">,</span>
+                <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="s2">&quot;base_url&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">},</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_DockerClient</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the underlying Docker client.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_connect</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigurationError</span><span class="p">(</span><span class="s2">&quot;Docker client not initialized&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span>
+
+<div class="viewcode-block" id="DockerClientWrapper.get_container">
+<a class="viewcode-back" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.get_container">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_container</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">container_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Container</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get container by ID or name.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            container_id: Container ID or name</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Container object</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ContainerNotFoundError: If container doesn&#39;t exist</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">containers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">container_id</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">NotFound</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ContainerNotFoundError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Container not found: </span><span class="si">{</span><span class="n">container_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;container_id&quot;</span><span class="p">:</span> <span class="n">container_id</span><span class="p">},</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="k">except</span> <span class="n">APIError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ContainerError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Error retrieving container: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;container_id&quot;</span><span class="p">:</span> <span class="n">container_id</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)},</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="DockerClientWrapper.list_containers">
+<a class="viewcode-back" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.list_containers">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_containers</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="nb">all</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">filters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Container</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List containers.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            all: Include stopped containers</span>
+<span class="sd">            filters: Filters to apply</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of Container objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">containers</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="nb">all</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">APIError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ContainerError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error listing containers: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)})</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="DockerClientWrapper.ping">
+<a class="viewcode-back" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.ping">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if Docker daemon is reachable.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if daemon responds</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">ping</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">DockerException</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="DockerClientWrapper.get_info">
+<a class="viewcode-back" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.get_info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get Docker daemon system information.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            System info dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">APIError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DockerHandlerError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Error getting Docker info: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="DockerClientWrapper.get_version">
+<a class="viewcode-back" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.get_version">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get Docker daemon version information.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Version info dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">version</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">APIError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DockerHandlerError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Error getting Docker version: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="DockerClientWrapper.handle_errors">
+<a class="viewcode-back" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.handle_errors">[docs]</a>
+    <span class="nd">@contextmanager</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Context manager for consistent error handling.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            operation: Description of operation being performed</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            with client.handle_errors(&quot;starting container&quot;):</span>
+<span class="sd">                container.start()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">yield</span>
+        <span class="k">except</span> <span class="n">NotFound</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ContainerNotFoundError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Container not found during </span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;operation&quot;</span><span class="p">:</span> <span class="n">operation</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)},</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="k">except</span> <span class="n">APIError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ContainerError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Docker API error during </span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;operation&quot;</span><span class="p">:</span> <span class="n">operation</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)},</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="k">except</span> <span class="n">DockerException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DockerHandlerError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Docker error during </span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;operation&quot;</span><span class="p">:</span> <span class="n">operation</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)},</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="DockerClientWrapper.close">
+<a class="viewcode-back" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.close">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close connection to Docker daemon.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Closed Docker client connection&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DockerClientWrapper.__enter__">
+<a class="viewcode-back" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.__enter__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DockerClientWrapper&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Context manager entry.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="DockerClientWrapper.__exit__">
+<a class="viewcode-back" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.__exit__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">exc_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="ne">BaseException</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">exc_val</span><span class="p">:</span> <span class="ne">BaseException</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">exc_tb</span><span class="p">:</span> <span class="n">TracebackType</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Context manager exit.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DockerClientWrapper.__del__">
+<a class="viewcode-back" href="../../api/docker_handler.html#docker_handler.client.DockerClientWrapper.__del__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cleanup on deletion.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, lolosioann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

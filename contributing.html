@@ -1,0 +1,318 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contributing &mdash; Otto CLI 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Changelog" href="changelog.html" />
+    <link rel="prev" title="Exception Classes" href="api/exceptions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Otto CLI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#basic-usage">Basic Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#connecting-to-docker">Connecting to Docker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#listing-containers">Listing Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#getting-container-information">Getting Container Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#docker-system-information">Docker System Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#using-context-managers">Using Context Managers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quickstart.html#error-handling">Error Handling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guides/error_handling.html">Error Handling Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/error_handling.html#exception-hierarchy">Exception Hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/error_handling.html#exception-details">Exception Details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/error_handling.html#common-scenarios">Common Scenarios</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="guides/error_handling.html#connection-failures">Connection Failures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/error_handling.html#container-not-found">Container Not Found</a></li>
+<li class="toctree-l3"><a class="reference internal" href="guides/error_handling.html#api-errors">API Errors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guides/error_handling.html#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/error_handling.html#context-manager-pattern">Context Manager Pattern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/error_handling.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guides/context_managers.html">Context Managers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/context_managers.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/context_managers.html#manual-connection-management">Manual Connection Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/context_managers.html#error-handling-context">Error Handling Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/context_managers.html#nested-context-managers">Nested Context Managers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/context_managers.html#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/context_managers.html#cleanup-guarantees">Cleanup Guarantees</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/context_managers.html#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/docker_handler.html">Docker Handler Module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/docker_handler.html#client-wrapper">Client Wrapper</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/docker_handler.html#docker_handler.client.DockerClientWrapper"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/docker_handler.html#docker_handler.client.DockerClientWrapper.__init__"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/docker_handler.html#docker_handler.client.DockerClientWrapper.client"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.client</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/docker_handler.html#docker_handler.client.DockerClientWrapper.get_container"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.get_container()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/docker_handler.html#docker_handler.client.DockerClientWrapper.list_containers"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.list_containers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/docker_handler.html#docker_handler.client.DockerClientWrapper.ping"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.ping()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/docker_handler.html#docker_handler.client.DockerClientWrapper.get_info"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.get_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/docker_handler.html#docker_handler.client.DockerClientWrapper.get_version"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.get_version()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/docker_handler.html#docker_handler.client.DockerClientWrapper.handle_errors"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.handle_errors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/docker_handler.html#docker_handler.client.DockerClientWrapper.close"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/docker_handler.html#docker_handler.client.DockerClientWrapper.__enter__"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.__enter__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/docker_handler.html#docker_handler.client.DockerClientWrapper.__exit__"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.__exit__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/docker_handler.html#docker_handler.client.DockerClientWrapper.__del__"><code class="docutils literal notranslate"><span class="pre">DockerClientWrapper.__del__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/docker_handler.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/docker_handler.html#cross-references">Cross-references</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/exceptions.html">Exception Classes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/exceptions.html#exception-hierarchy">Exception Hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/exceptions.html#base-exception">Base Exception</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/exceptions.html#docker_handler.exceptions.DockerHandlerError"><code class="docutils literal notranslate"><span class="pre">DockerHandlerError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/exceptions.html#docker_handler.exceptions.DockerHandlerError.__init__"><code class="docutils literal notranslate"><span class="pre">DockerHandlerError.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/exceptions.html#container-exceptions">Container Exceptions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/exceptions.html#docker_handler.exceptions.ContainerError"><code class="docutils literal notranslate"><span class="pre">ContainerError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/exceptions.html#docker_handler.exceptions.ContainerNotFoundError"><code class="docutils literal notranslate"><span class="pre">ContainerNotFoundError</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/exceptions.html#configuration-exceptions">Configuration Exceptions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/exceptions.html#docker_handler.exceptions.ConfigurationError"><code class="docutils literal notranslate"><span class="pre">ConfigurationError</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/exceptions.html#usage-examples">Usage Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/exceptions.html#exception-details">Exception Details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/exceptions.html#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#documentation-guidelines">Documentation Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#write-more-than-docstrings">Write More Than Docstrings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#use-restructuredtext-features">Use reStructuredText Features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#documentation-checks">Documentation Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-docs-locally">Building Docs Locally</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing-doctests">Testing Doctests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spell-checking">Spell-Checking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#style-guide">Style Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1-0-2025-01-02">Version 0.1.0 (2025-01-02)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#features">Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#api">API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#development">Development</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Otto CLI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Contributing</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/contributing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Link to this heading"></a></h1>
+<p>See the main <code class="file docutils literal notranslate"><span class="pre">CONTRIBUTING.md</span></code> in the repository root for development setup and guidelines.</p>
+<section id="documentation-guidelines">
+<h2>Documentation Guidelines<a class="headerlink" href="#documentation-guidelines" title="Link to this heading"></a></h2>
+<p>When contributing documentation:</p>
+<section id="write-more-than-docstrings">
+<h3>Write More Than Docstrings<a class="headerlink" href="#write-more-than-docstrings" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Docstrings</strong>: API reference (what functions do)</p></li>
+<li><p><strong>Guides</strong>: How-to articles, tutorials, best practices</p></li>
+<li><p><strong>Narrative docs</strong>: Architecture, design decisions, concepts</p></li>
+</ul>
+</section>
+<section id="use-restructuredtext-features">
+<h3>Use reStructuredText Features<a class="headerlink" href="#use-restructuredtext-features" title="Link to this heading"></a></h3>
+<p>Cross-references:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="na">:py:class:</span><span class="nv">`~docker_handler.client.DockerClientWrapper`</span>
+<span class="na">:py:exc:</span><span class="nv">`ValueError`</span>
+<span class="na">:doc:</span><span class="nv">`guides/error_handling`</span>
+<span class="na">:ref:</span><span class="nv">`some-label`</span>
+</pre></div>
+</div>
+<p>Code blocks with doctest:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">doctest</span><span class="p">::</span>
+
+   &gt;&gt;&gt; from docker_handler import DockerClientWrapper
+   &gt;&gt;&gt; client = DockerClientWrapper()
+   &gt;&gt;&gt; client.ping()
+   True
+</pre></div>
+</div>
+<p>Directives:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">note</span><span class="p">::</span> Important information
+
+<span class="p">..</span> <span class="ow">warning</span><span class="p">::</span> Critical warning
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">python</span>
+
+   <span class="c1"># Code example</span>
+   <span class="k">pass</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="documentation-checks">
+<h2>Documentation Checks<a class="headerlink" href="#documentation-checks" title="Link to this heading"></a></h2>
+<p>Before submitting:</p>
+<ol class="arabic simple">
+<li><p><strong>Spell-check</strong>: <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">spelling</span></code> (runs sphinxcontrib-spelling)</p></li>
+<li><p><strong>Doctest</strong>: <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">doctest</span></code> (tests code examples)</p></li>
+<li><p><strong>Build</strong>: <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> (builds HTML output)</p></li>
+<li><p><strong>Interrogate</strong>: Pre-commit hook checks docstring coverage</p></li>
+</ol>
+<p>All checks run automatically in CI.</p>
+</section>
+<section id="building-docs-locally">
+<h2>Building Docs Locally<a class="headerlink" href="#building-docs-locally" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>docs
+make<span class="w"> </span>html
+open<span class="w"> </span>_build/html/index.html
+</pre></div>
+</div>
+<p>Or using uv:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>sphinx-build<span class="w"> </span>-b<span class="w"> </span>html<span class="w"> </span>docs<span class="w"> </span>docs/_build/html
+</pre></div>
+</div>
+</section>
+<section id="testing-doctests">
+<h2>Testing Doctests<a class="headerlink" href="#testing-doctests" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>sphinx-build<span class="w"> </span>-b<span class="w"> </span>doctest<span class="w"> </span>docs<span class="w"> </span>docs/_build/doctest
+</pre></div>
+</div>
+</section>
+<section id="spell-checking">
+<h2>Spell-Checking<a class="headerlink" href="#spell-checking" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>sphinx-build<span class="w"> </span>-b<span class="w"> </span>spelling<span class="w"> </span>docs<span class="w"> </span>docs/_build/spelling
+</pre></div>
+</div>
+<p>Add project-specific words to <code class="file docutils literal notranslate"><span class="pre">spelling_wordlist.txt</span></code>.</p>
+</section>
+<section id="style-guide">
+<h2>Style Guide<a class="headerlink" href="#style-guide" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Line length: ~80 characters in reST</p></li>
+<li><p>Use semantic markup: <code class="docutils literal notranslate"><span class="pre">:py:class:</span></code>, <code class="docutils literal notranslate"><span class="pre">:py:func:</span></code>, etc.</p></li>
+<li><p>Include examples for all public APIs</p></li>
+<li><p>Write from user perspective, not implementation</p></li>
+<li><p>Test all code examples with doctest</p></li>
+</ul>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.sphinx-doc.org/">Sphinx documentation</a></p></li>
+<li><p><a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html">reStructuredText primer</a></p></li>
+<li><p><a class="reference external" href="https://sphinxcontrib-napoleon.readthedocs.io/">Napoleon documentation</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api/exceptions.html" class="btn btn-neutral float-left" title="Exception Classes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, lolosioann.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
