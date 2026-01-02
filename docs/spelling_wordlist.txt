@@ -1,5 +1,6 @@
 API
 autodoc
+changelog
 CLI
 conf
 contrib
@@ -7,12 +8,14 @@ datetime
 docstring
 docstrings
 doctest
+doctests
 env
 intersphinx
 lolosioann
 mypy
 napoleon
 Otto
+pre-commit
 py
 pytest
 pyproject

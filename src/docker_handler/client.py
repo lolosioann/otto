@@ -40,11 +40,16 @@ class DockerClientWrapper:
         """
         Initialize Docker client wrapper.
 
-        Args:
-            base_url: Docker daemon URL (default: from environment)
-            tls: TLS configuration
-            timeout: Request timeout in seconds
-            **kwargs: Additional Docker client parameters
+        Parameters
+        ----------
+        base_url : str or None, optional
+            Docker daemon URL (default: from environment)
+        tls : Any or None, optional
+            TLS configuration
+        timeout : int, default=60
+            Request timeout in seconds
+        **kwargs : Any
+            Additional Docker client parameters
         """
         self.base_url = base_url
         self.tls = tls
