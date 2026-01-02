@@ -2,3 +2,22 @@ notes/
 __pycache__/
 .venv/
 CLAUDE.md
+
+# Python build artifacts
+dist/
+build/
+*.egg-info/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Type checking
+.mypy_cache/
+
+# Linting
+.ruff_cache/
+
+# Documentation
+docs/_build/

@@ -9,12 +9,11 @@ description = "CLI tool for monitoring and orchestrating containers"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-
 authors = [
-    { name = "lolosioann", email = "lolosioann@gmail.com"}
+    { name = "lolosioann", email = "lolosioann@gmail.com" }
 ]
-
 dependencies = [
+    "docker>=7.0.0",
 ]
 
 [project.optional-dependencies]
@@ -25,57 +24,58 @@ dev = [
     "ruff",
     "bandit",
     "interrogate",
-    "radon",
-    "xenon",
-    "import-linter",
     "sphinx",
     "sphinx-rtd-theme",
+    "myst-parser",
+    "mypy",
 ]
 
+# ------------------------
+# Ruff configuration
+# ------------------------
 [tool.ruff]
 line-length = 100
 target-version = "py310"
 src = ["src"]
 
-select = [
-    "E", "F", "I",
-    "B",
-    "UP",
-    "SIM",
-    "C4",
-]
-
-ignore = [
-    "E501",
-]
-
-[tool.ruff.per-file-ignores]
-"tests/**" = ["S101"]
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "C4"]
+ignore = ["E501"]
+per-file-ignores = { "tests/**" = ["S101"] }
 
 [tool.ruff.format]
 quote-style = "double"
 
+# ------------------------
+# Pytest configuration
+# ------------------------
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--strict-markers --strict-config"
 pythonpath = ["src"]
 
+# ------------------------
+# Coverage configuration
+# ------------------------
 [tool.coverage.run]
 branch = true
-# source = ["mycli"]
-# omit = [
-#     "*/__init__.py",
-#     "*/cli/*",
-# ]
+source = ["src"]
+omit = ["*/__init__.py", "*/cli/*"]
 
 [tool.coverage.report]
 fail_under = 85
 show_missing = true
 
+# ------------------------
+# Bandit security scanner
+# ------------------------
 [tool.bandit]
 skips = ["B101"]
 exclude_dirs = ["tests"]
 
+# ------------------------
+# Interrogate docstring enforcement
+# ------------------------
 [tool.interrogate]
 ignore-init-method = true
 ignore-init-module = true
@@ -85,14 +85,31 @@ ignore-magic = true
 fail-under = 80
 exclude = ["tests", "cli"]
 
-[tool.radon]
-cc_min = "B"
+# ------------------------
+# Mypy type checking
+# ------------------------
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_any_unimported = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+check_untyped_defs = true
+strict_equality = true
 
-[tool.xenon]
-max-absolute = "C"
-max-modules = "B"
-max-average = "B"
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+check_untyped_defs = false
 
-[tool.importlinter]
-root_package = "mycli"
-include_external_packages = false
+[dependency-groups]
+dev = [
+    "myst-parser>=4.0.1",
+    "pyenchant>=3.3.0",
+    "sphinxcontrib-spelling>=8.0.2",
+    "types-docker>=7.1.0.20251202",
+]

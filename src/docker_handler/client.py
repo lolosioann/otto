@@ -40,11 +40,16 @@ class DockerClientWrapper:
         """
         Initialize Docker client wrapper.
 
-        Args:
-            base_url: Docker daemon URL (default: from environment)
-            tls: TLS configuration
-            timeout: Request timeout in seconds
-            **kwargs: Additional Docker client parameters
+        Parameters
+        ----------
+        base_url : str or None, optional
+            Docker daemon URL (default: from environment)
+        tls : Any or None, optional
+            TLS configuration
+        timeout : int, default=60
+            Request timeout in seconds
+        **kwargs : Any
+            Additional Docker client parameters
         """
         self.base_url = base_url
         self.tls = tls
@@ -75,13 +80,15 @@ class DockerClientWrapper:
             raise ConfigurationError(
                 "Cannot connect to Docker daemon",
                 details={"error": str(e), "base_url": self.base_url},
-            )
+            ) from e
 
     @property
     def client(self) -> _DockerClient:
         """Get the underlying Docker client."""
         if self._client is None:
             self._connect()
+        if self._client is None:
+            raise ConfigurationError("Docker client not initialized")
         return self._client
 
     def get_container(self, container_id: str) -> Container:
@@ -99,16 +106,16 @@ class DockerClientWrapper:
         """
         try:
             return self.client.containers.get(container_id)
-        except NotFound:
+        except NotFound as e:
             raise ContainerNotFoundError(
                 f"Container not found: {container_id}",
                 details={"container_id": container_id},
-            )
+            ) from e
         except APIError as e:
             raise ContainerError(
                 f"Error retrieving container: {e}",
                 details={"container_id": container_id, "error": str(e)},
-            )
+            ) from e
 
     def list_containers(
         self, all: bool = False, filters: dict[str, Any] | None = None
@@ -124,11 +131,9 @@ class DockerClientWrapper:
             List of Container objects
         """
         try:
-            return self.client.containers.list(all=all, filters=filters)  # type: ignore[no-any-return]
+            return self.client.containers.list(all=all, filters=filters)
         except APIError as e:
-            raise ContainerError(
-                f"Error listing containers: {e}", details={"error": str(e)}
-            )
+            raise ContainerError(f"Error listing containers: {e}", details={"error": str(e)}) from e
 
     def ping(self) -> bool:
         """
@@ -138,7 +143,7 @@ class DockerClientWrapper:
             True if daemon responds
         """
         try:
-            return self.client.ping()  # type: ignore[no-any-return]
+            return self.client.ping()
         except DockerException:
             return False
 
@@ -150,11 +155,11 @@ class DockerClientWrapper:
             System info dictionary
         """
         try:
-            return self.client.info()  # type: ignore[no-any-return]
+            return self.client.info()
         except APIError as e:
             raise DockerHandlerError(
                 f"Error getting Docker info: {e}", details={"error": str(e)}
-            )
+            ) from e
 
     def get_version(self) -> dict[str, Any]:
         """
@@ -164,11 +169,11 @@ class DockerClientWrapper:
             Version info dictionary
         """
         try:
-            return self.client.version()  # type: ignore[no-any-return]
+            return self.client.version()
         except APIError as e:
             raise DockerHandlerError(
                 f"Error getting Docker version: {e}", details={"error": str(e)}
-            )
+            ) from e
 
     @contextmanager
     def handle_errors(self, operation: str) -> Generator[None, None, None]:
@@ -191,17 +196,17 @@ class DockerClientWrapper:
             raise ContainerNotFoundError(
                 f"Container not found during {operation}",
                 details={"operation": operation, "error": str(e)},
-            )
+            ) from e
         except APIError as e:
             raise ContainerError(
                 f"Docker API error during {operation}: {e}",
                 details={"operation": operation, "error": str(e)},
-            )
+            ) from e
         except DockerException as e:
             raise DockerHandlerError(
                 f"Docker error during {operation}: {e}",
                 details={"operation": operation, "error": str(e)},
-            )
+            ) from e
 
     def close(self) -> None:
         """Close connection to Docker daemon."""
