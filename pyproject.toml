@@ -101,6 +101,11 @@ warn_no_return = true
 check_untyped_defs = true
 strict_equality = true
 
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+check_untyped_defs = false
+
 [dependency-groups]
 dev = [
     "myst-parser>=4.0.1",
