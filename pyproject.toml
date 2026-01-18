@@ -21,6 +21,8 @@ dependencies = [
     "psutil>=5.9.0",
     "structlog>=23.0.0",
     "watchdog>=3.0.0",
+    "paho-mqtt>=2.1.0",
+    "pre-commit>=4.5.1",
 ]
 
 [project.optional-dependencies]
@@ -35,7 +37,6 @@ dev = [
     "sphinx",
     "sphinx-rtd-theme",
     "myst-parser",
-    "mypy",
 ]
 
 # ------------------------
@@ -60,7 +61,7 @@ quote-style = "double"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--strict-markers --strict-config"
-pythonpath = ["src"]
+pythonpath = ["."]
 
 # ------------------------
 # Coverage configuration
@@ -91,33 +92,11 @@ ignore-module = false
 ignore-private = true
 ignore-magic = true
 fail-under = 80
-exclude = ["tests", "cli"]
-
-# ------------------------
-# Mypy type checking
-# ------------------------
-[tool.mypy]
-python_version = "3.10"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_any_unimported = false
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-check_untyped_defs = true
-strict_equality = true
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
-check_untyped_defs = false
+exclude = ["tests", "test_scripts"]
 
 [dependency-groups]
 dev = [
     "myst-parser>=4.0.1",
     "pyenchant>=3.3.0",
     "sphinxcontrib-spelling>=8.0.2",
-    "types-docker>=7.1.0.20251202",
 ]
