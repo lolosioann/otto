@@ -82,12 +82,29 @@ class DockerManager:
             raise RuntimeError(f"Failed to pull image {image}: {e}") from e
 
     async def create_container(
-        self, image: str, name: str | None = None, detach: bool = True
+        self,
+        image: str,
+        name: str | None = None,
+        command: str | list[str] | None = None,
+        detach: bool = True,
     ) -> str:
         """Create and start a new container.
 
-        Pulls the image if not available locally.
-        Returns the container ID.
+        Parameters
+        ----------
+        image : str
+            The image to create the container from.
+        name : str, optional
+            The name for the container.
+        command : str or list[str], optional
+            Command to run in the container. Required for imported images.
+        detach : bool
+            Whether to start the container (default: True).
+
+        Returns
+        -------
+        str
+            The container ID.
         """
         try:
             await self.connect()
@@ -97,7 +114,12 @@ class DockerManager:
             except Exception:
                 await self.pull_image(image)
 
-            config = {"Image": image}
+            config: dict = {"Image": image}
+            if command:
+                if isinstance(command, str):
+                    config["Cmd"] = command.split()
+                else:
+                    config["Cmd"] = command
             container = await self.docker.containers.create_or_replace(
                 name=name or image.replace(":", "_").replace("/", "_"),
                 config=config,
@@ -116,3 +138,88 @@ class DockerManager:
             await container.delete(force=force)
         except Exception as e:
             raise RuntimeError(f"Failed to remove container {container_id}: {e}") from e
+
+    async def export_container(self, container_id: str) -> bytes:
+        """Export a container's filesystem as a tarball.
+
+        Parameters
+        ----------
+        container_id : str
+            The container ID or name to export.
+
+        Returns
+        -------
+        bytes
+            The container filesystem as a tar archive.
+        """
+        try:
+            await self.connect()
+            # Use low-level API: GET /containers/{id}/export
+            # Returns a streaming response, collect all chunks
+            chunks = []
+            async with self.docker._query(
+                f"containers/{container_id}/export",
+                method="GET",
+            ) as response:
+                async for chunk in response.content.iter_any():
+                    chunks.append(chunk)
+            return b"".join(chunks)
+        except Exception as e:
+            raise RuntimeError(f"Failed to export container {container_id}: {e}") from e
+
+    async def import_image(self, data: bytes, repository: str, tag: str = "latest") -> str:
+        """Import a tarball as a new Docker image.
+
+        Parameters
+        ----------
+        data : bytes
+            The tar archive data to import.
+        repository : str
+            The repository name for the new image.
+        tag : str
+            The tag for the new image (default: "latest").
+
+        Returns
+        -------
+        str
+            The ID of the imported image.
+        """
+        try:
+            await self.connect()
+            # Use the low-level API to import
+            async with self.docker._query(
+                "images/create",
+                method="POST",
+                params={"fromSrc": "-", "repo": repository, "tag": tag},
+                data=data,
+                headers={"Content-Type": "application/x-tar"},
+            ) as response:
+                # Consume the response to ensure import completes
+                async for _ in response.content.iter_any():
+                    pass
+            image = await self.docker.images.inspect(f"{repository}:{tag}")
+            return image["Id"]
+        except Exception as e:
+            raise RuntimeError(f"Failed to import image as {repository}:{tag}: {e}") from e
+
+    async def get_container_info(self, container_id: str) -> dict:
+        """Get detailed information about a container.
+
+        Useful for extracting configuration to recreate the container elsewhere.
+
+        Parameters
+        ----------
+        container_id : str
+            The container ID or name.
+
+        Returns
+        -------
+        dict
+            Container configuration and state information.
+        """
+        try:
+            await self.connect()
+            container = await self.docker.containers.get(container_id)
+            return await container.show()
+        except Exception as e:
+            raise RuntimeError(f"Failed to get container info for {container_id}: {e}") from e
