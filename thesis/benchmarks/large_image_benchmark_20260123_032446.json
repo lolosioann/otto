@@ -1,0 +1,76 @@
+[
+  {
+    "image": "golang:1.21",
+    "image_label": "golang",
+    "strategy": "stop_start",
+    "repetition": 1,
+    "success": true,
+    "export_time_s": 10.142878509999719,
+    "transfer_size_bytes": 0,
+    "import_time_s": 9.045906912999271,
+    "container_start_time_s": 0.0,
+    "total_time_s": 19.752557630999945,
+    "source_host": "unix:///var/run/docker.sock",
+    "target_host": "ssh://lolosioann@192.168.2.7"
+  },
+  {
+    "image": "golang:1.21",
+    "image_label": "golang",
+    "strategy": "stop_start",
+    "repetition": 2,
+    "success": true,
+    "export_time_s": 10.150268370000049,
+    "transfer_size_bytes": 0,
+    "import_time_s": 1.417645327000173,
+    "container_start_time_s": 0.0,
+    "total_time_s": 11.98731921199942,
+    "source_host": "unix:///var/run/docker.sock",
+    "target_host": "ssh://lolosioann@192.168.2.7"
+  },
+  {
+    "image": "golang:1.21",
+    "image_label": "golang",
+    "strategy": "export_import",
+    "repetition": 1,
+    "success": false,
+    "export_time_s": 12.925820047000343,
+    "transfer_size_bytes": 833486848,
+    "import_time_s": 0.0,
+    "container_start_time_s": 0.0,
+    "total_time_s": 23.475984492999487,
+    "source_host": "unix:///var/run/docker.sock",
+    "target_host": "ssh://lolosioann@192.168.2.7"
+  },
+  {
+    "image": "golang:1.21",
+    "image_label": "golang",
+    "strategy": "export_import",
+    "repetition": 2,
+    "success": false,
+    "export_time_s": 12.934871251000004,
+    "transfer_size_bytes": 833486848,
+    "import_time_s": 0.0,
+    "container_start_time_s": 0.0,
+    "total_time_s": 23.802482555000097,
+    "source_host": "unix:///var/run/docker.sock",
+    "target_host": "ssh://lolosioann@192.168.2.7"
+  },
+  {
+    "image": "golang:1.21",
+    "image_label": "golang",
+    "strategy": "swarm",
+    "repetition": 1,
+    "success": true,
+    "total_time_s": 17.155475976999696,
+    "transfer_size_bytes": 0
+  },
+  {
+    "image": "golang:1.21",
+    "image_label": "golang",
+    "strategy": "swarm",
+    "repetition": 2,
+    "success": true,
+    "total_time_s": 16.979096746000323,
+    "transfer_size_bytes": 0
+  }
+]

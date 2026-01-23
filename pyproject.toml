@@ -23,6 +23,7 @@ dependencies = [
     "watchdog>=3.0.0",
     "paho-mqtt>=2.1.0",
     "pre-commit>=4.5.1",
+    "asyncssh>=2.22.0",
 ]
 
 [project.optional-dependencies]
@@ -96,7 +97,10 @@ exclude = ["tests", "test_scripts"]
 
 [dependency-groups]
 dev = [
+    "matplotlib>=3.10.8",
     "myst-parser>=4.0.1",
+    "pandas>=2.3.3",
     "pyenchant>=3.3.0",
+    "seaborn>=0.13.2",
     "sphinxcontrib-spelling>=8.0.2",
 ]
