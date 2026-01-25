@@ -12,6 +12,29 @@ services:
       - ./mqtt5/log:/mosquitto/log:rw
     restart: unless-stopped
 
+  # Test containers for metrics collection
+  test-nginx:
+    image: nginx:alpine
+    container_name: test-nginx
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  test-redis:
+    image: redis:alpine
+    container_name: test-redis
+    restart: unless-stopped
+
+  test-cpu-load:
+    image: busybox
+    container_name: test-cpu-load
+    command: sh -c "while true; do echo 'working' > /dev/null; done"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+
 networks:
   default:
     name: mqtt5-network

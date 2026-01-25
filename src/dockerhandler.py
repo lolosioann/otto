@@ -41,12 +41,25 @@ class DockerManager:
         except Exception as e:
             raise RuntimeError(f"Failed to get containers: {e}") from e
 
-    async def get_container_stats(self, container_id: str):
+    async def get_container_stats(self, container_id: str) -> dict:
+        """Get stats for a container.
+
+        Parameters
+        ----------
+        container_id : str
+            The container ID or name.
+
+        Returns
+        -------
+        dict
+            Container stats including CPU, memory, network, and I/O.
+        """
         try:
             await self.connect()
             container = await self.docker.containers.get(container_id)
             stats = await container.stats(stream=False)
-            return stats
+            # aiodocker returns a list even with stream=False
+            return stats[0] if isinstance(stats, list) else stats
         except Exception as e:
             raise RuntimeError(f"Failed to get stats for container {container_id}: {e}") from e
 

@@ -9,8 +9,11 @@ from src.docker_handler_server import (
     StopContainerMessage,
 )
 from src.dockerhandler import DockerManager
+from src.metrics import MetricsCollector, MetricsPublisher
+from src.models import ContainerMetrics, ContainerMetricsBatch, NodeMetrics
 
 __all__ = [
+    # Docker
     "DockerManager",
     "DockerHandlerServer",
     "CreateContainerMessage",
@@ -18,4 +21,10 @@ __all__ = [
     "RemoveContainerMessage",
     "StartContainerMessage",
     "StopContainerMessage",
+    # Metrics
+    "MetricsCollector",
+    "MetricsPublisher",
+    "NodeMetrics",
+    "ContainerMetrics",
+    "ContainerMetricsBatch",
 ]
