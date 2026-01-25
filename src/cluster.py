@@ -12,6 +12,7 @@ from pathlib import Path
 from src.config import OttoConfig
 from src.control_plane import ControlPlane
 from src.node_agent import NodeAgent
+from src.remote import RemoteNodeDeployer
 
 # State file location
 STATE_DIR = Path(".otto")
@@ -88,7 +89,8 @@ class ClusterManager:
     def __init__(self, config: OttoConfig):
         self.config = config
         self._control_plane: ControlPlane | None = None
-        self._node_agents: dict[str, NodeAgent] = {}
+        self._local_agents: dict[str, NodeAgent] = {}
+        self._remote_deployers: dict[str, RemoteNodeDeployer] = {}
         self._running = False
 
     async def start(self) -> None:
@@ -103,15 +105,35 @@ class ClusterManager:
         )
         self._control_plane.start()
 
-        # Start node agents (local only for MVP)
+        # Start node agents
         for node_config in self.config.nodes:
-            if node_config.host in ("localhost", "127.0.0.1"):
+            services = self.config.get_services_for_node(node_config.id)
+
+            if node_config.is_local:
+                # Start local node agent
                 agent = NodeAgent(
                     node_config=node_config,
                     mqtt_config=self.config.mqtt,
                 )
                 await agent.start()
-                self._node_agents[node_config.id] = agent
+
+                # Deploy services on local node
+                if services:
+                    await agent.deploy_services(services)
+
+                self._local_agents[node_config.id] = agent
+            else:
+                # Deploy to remote node via SSH
+                deployer = RemoteNodeDeployer(
+                    node=node_config,
+                    mqtt=self.config.mqtt,
+                )
+                try:
+                    await deployer.connect()
+                    await deployer.deploy_agent(services)
+                    self._remote_deployers[node_config.id] = deployer
+                except Exception as e:
+                    print(f"[WARN] Failed to deploy to {node_config.id}: {e}")
 
         self._running = True
 
@@ -122,10 +144,15 @@ class ClusterManager:
 
         self._running = False
 
-        # Stop node agents
-        for agent in self._node_agents.values():
+        # Stop local node agents
+        for agent in self._local_agents.values():
             await agent.stop()
-        self._node_agents.clear()
+        self._local_agents.clear()
+
+        # Stop remote deployers
+        for deployer in self._remote_deployers.values():
+            await deployer.stop()
+        self._remote_deployers.clear()
 
         # Stop control plane
         if self._control_plane:
@@ -157,10 +184,18 @@ class ClusterManager:
         }
 
         for node_config in self.config.nodes:
+            is_local = node_config.is_local
+            agent_running = (
+                node_config.id in self._local_agents
+                if is_local
+                else node_config.id in self._remote_deployers
+            )
+
             node_status = {
                 "id": node_config.id,
                 "host": node_config.host,
-                "agent_running": node_config.id in self._node_agents,
+                "type": "local" if is_local else "remote",
+                "agent_running": agent_running,
             }
 
             # Add metrics if available

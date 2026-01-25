@@ -1,8 +1,8 @@
 cluster:
-  name: dev-cluster
+  name: home-cluster
 
 mqtt:
-  host: localhost
+  host: 192.168.2.3
   port: 1883
 
 nodes:
@@ -10,4 +10,20 @@ nodes:
     host: localhost
     docker_url: unix:///var/run/docker.sock
 
-services: []
+  - id: rpi-01
+    host: 192.168.2.7
+    user: lolosioann
+    docker_url: unix:///var/run/docker.sock
+
+services:
+  - name: test-redis
+    image: redis:alpine
+    node: local
+
+  - name: test-nginx
+    image: nginx:alpine
+    node: rpi-01
+    ports:
+      - "8080:80"
+    environment:
+      NGINX_HOST: example.com

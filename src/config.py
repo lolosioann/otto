@@ -33,13 +33,21 @@ class NodeConfig(BaseModel):
         Unique node identifier.
     host : str
         Node hostname or IP address.
+    user : str, optional
+        SSH user for remote nodes. None for local nodes.
     docker_url : str
         Docker daemon URL on the node.
     """
 
     id: str
     host: str
+    user: str | None = None
     docker_url: str = "unix:///var/run/docker.sock"
+
+    @property
+    def is_local(self) -> bool:
+        """Check if this is a local node (no SSH needed)."""
+        return self.host in ("localhost", "127.0.0.1") or self.user is None
 
 
 class ServiceConfig(BaseModel):

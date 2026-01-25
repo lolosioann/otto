@@ -1,30 +1,31 @@
-# Plan: CLI Interface for Otto Cluster Management
+# Plan: Centralized Cluster Deployment via SSH
 
 ## Goal
 
-Create a Docker-like CLI for managing Otto clusters with commands like:
-- `otto cluster init` - Initialize cluster from config file
-- `otto cluster start` - Start the cluster (control plane + node agents)
-- `otto cluster stop` - Stop the cluster
-- `otto cluster status` - Show cluster status
+Deploy entire cluster from control plane:
+- SSH into remote nodes
+- Start node agents remotely
+- Deploy containers as specified in config
 
-## Config File Format (`otto.yaml`)
+## Config Format (docker-compose style)
 
 ```yaml
 cluster:
-  name: my-cluster
+  name: home-cluster
 
 mqtt:
-  host: localhost
+  host: 192.168.2.1  # Control plane IP
   port: 1883
 
 nodes:
-  - id: rpi-01
-    host: 192.168.2.7
-    docker_url: unix:///var/run/docker.sock  # Local to that node
-
   - id: local
     host: localhost
+    user: null  # No SSH needed
+    docker_url: unix:///var/run/docker.sock
+
+  - id: rpi-01
+    host: 192.168.2.7
+    user: lolosioann  # SSH user
     docker_url: unix:///var/run/docker.sock
 
 services:
@@ -33,262 +34,246 @@ services:
     node: rpi-01
     ports:
       - "8080:80"
+    environment:
+      NGINX_HOST: localhost
 
   - name: test-redis
     image: redis:alpine
     node: local
-```
-
-## CLI Structure
-
-```
-otto
-├── cluster
-│   ├── init      # Read otto.yaml, validate, save state
-│   ├── start     # Start control plane + node agents
-│   ├── stop      # Stop everything
-│   └── status    # Show cluster state
-└── node
-    ├── list      # List nodes
-    └── metrics   # Show node metrics (future)
+    command: redis-server --appendonly yes
 ```
 
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         otto cluster start                       │
+│                    Control Plane (PC)                            │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │
+│  │ ClusterMgr  │  │ ControlPlane│  │ RemoteNodeDeployer      │  │
+│  │             │  │ (metrics)   │  │ - SSH into nodes        │  │
+│  │             │  │             │  │ - Start node agents     │  │
+│  │             │  │             │  │ - Deploy containers     │  │
+│  └─────────────┘  └─────────────┘  └─────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      Control Plane (local)                       │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  │
-│  │ MetricsSubscriber│  │ ClusterManager  │  │  ServiceManager │  │
-│  └─────────────────┘  └─────────────────┘  └─────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
-                               │ MQTT
-                               ▼
-┌──────────────────────┐      ┌──────────────────────┐
-│   Node Agent (rpi-01) │      │   Node Agent (local)  │
-│  ┌────────────────┐  │      │  ┌────────────────┐   │
-│  │MetricsPublisher│  │      │  │MetricsPublisher│   │
-│  │ DockerManager  │  │      │  │ DockerManager  │   │
-│  └────────────────┘  │      │  └────────────────┘   │
-└──────────────────────┘      └──────────────────────┘
+         │                                      │
+         │ MQTT                                 │ SSH
+         ▼                                      ▼
+┌──────────────────────┐               ┌──────────────────────┐
+│   Local Node Agent   │               │   Remote Node (Pi)   │
+│   (in-process)       │               │   - Node Agent proc  │
+│                      │               │   - Containers       │
+└──────────────────────┘               └──────────────────────┘
 ```
 
 ## Implementation Steps
 
-### Step 1: Add Dependencies
-
-```toml
-# pyproject.toml
-dependencies = [
-    ...
-    "typer>=0.9.0",
-    "rich>=13.0.0",  # For pretty output (typer dependency)
-    "pyyaml>=6.0.0",
-]
-
-[project.scripts]
-otto = "src.cli:app"
-```
-
-### Step 2: Config Models (`src/config.py`)
+### Step 1: Enhance Config Models
 
 ```python
-from pydantic import BaseModel, Field
-from pydantic_settings import BaseSettings
-
-class MQTTConfig(BaseModel):
-    host: str = "localhost"
-    port: int = 1883
+# src/config.py
 
 class NodeConfig(BaseModel):
     id: str
     host: str
+    user: str | None = None  # SSH user, None for local
     docker_url: str = "unix:///var/run/docker.sock"
+
+    @property
+    def is_local(self) -> bool:
+        return self.host in ("localhost", "127.0.0.1") or self.user is None
 
 class ServiceConfig(BaseModel):
     name: str
     image: str
     node: str
     command: str | None = None
-    ports: list[str] = Field(default_factory=list)
-    environment: dict[str, str] = Field(default_factory=dict)
+    ports: list[str] = []           # "8080:80"
+    environment: dict[str, str] = {}
+    # Deferred: volumes, networks, resource limits
+```
 
-class ClusterConfig(BaseModel):
-    name: str = "default"
+### Step 2: Remote Node Deployer
 
-class OttoConfig(BaseModel):
-    cluster: ClusterConfig = Field(default_factory=ClusterConfig)
-    mqtt: MQTTConfig = Field(default_factory=MQTTConfig)
-    nodes: list[NodeConfig] = Field(default_factory=list)
-    services: list[ServiceConfig] = Field(default_factory=list)
+```python
+# src/remote.py
 
-    @classmethod
-    def from_yaml(cls, path: str) -> "OttoConfig":
+class RemoteNodeDeployer:
+    """Deploy node agents to remote nodes via SSH."""
+
+    def __init__(self, node: NodeConfig, mqtt: MQTTConfig):
+        self.node = node
+        self.mqtt = mqtt
+        self._ssh: asyncssh.SSHClientConnection | None = None
+        self._process: asyncssh.SSHClientProcess | None = None
+
+    async def connect(self) -> None:
+        """Establish SSH connection."""
+        self._ssh = await asyncssh.connect(
+            self.node.host,
+            username=self.node.user,
+            known_hosts=None,  # Or configure properly
+        )
+
+    async def deploy_agent(self) -> None:
+        """Start node agent on remote node."""
+        # Run node agent script via SSH
+        cmd = f"""
+        cd ~/otto && uv run python -c "
+import asyncio
+from src.node_agent import run_node_agent
+from src.config import NodeConfig, MQTTConfig
+asyncio.run(run_node_agent(
+    NodeConfig(id='{self.node.id}', host='{self.node.host}'),
+    MQTTConfig(host='{self.mqtt.host}', port={self.mqtt.port}),
+))
+"
+        """
+        self._process = await self._ssh.create_process(cmd)
+
+    async def stop(self) -> None:
+        """Stop remote node agent."""
+        if self._process:
+            self._process.terminate()
+        if self._ssh:
+            self._ssh.close()
+```
+
+### Step 3: Container Deployer
+
+```python
+# src/node_agent.py (extend)
+
+class NodeAgent:
+    ...
+
+    async def deploy_services(self, services: list[ServiceConfig]) -> None:
+        """Deploy containers for this node."""
+        for service in services:
+            await self._deploy_service(service)
+
+    async def _deploy_service(self, service: ServiceConfig) -> None:
+        """Create and start a container from service config."""
+        # Check if container exists
+        # If not, create it
+        # Start it
         ...
 ```
 
-### Step 3: CLI Entry Point (`src/cli.py`)
+### Step 4: Update ClusterManager
 
 ```python
-import typer
+# src/cluster.py (update)
 
-app = typer.Typer(help="Otto - Container orchestration for edge computing")
-cluster_app = typer.Typer(help="Cluster management commands")
-app.add_typer(cluster_app, name="cluster")
-
-@cluster_app.command("init")
-def cluster_init(
-    config: str = typer.Option("otto.yaml", "--config", "-c", help="Config file path")
-):
-    """Initialize cluster from config file."""
-    ...
-
-@cluster_app.command("start")
-def cluster_start():
-    """Start the cluster."""
-    ...
-
-@cluster_app.command("stop")
-def cluster_stop():
-    """Stop the cluster."""
-    ...
-
-@cluster_app.command("status")
-def cluster_status():
-    """Show cluster status."""
-    ...
-```
-
-### Step 4: Cluster Manager (`src/cluster.py`)
-
-```python
 class ClusterManager:
-    """Manages the Otto cluster lifecycle."""
-
     def __init__(self, config: OttoConfig):
         self.config = config
-        self._node_agents: dict[str, NodeAgent] = {}
         self._control_plane: ControlPlane | None = None
+        self._local_agents: dict[str, NodeAgent] = {}
+        self._remote_deployers: dict[str, RemoteNodeDeployer] = {}
 
     async def start(self) -> None:
-        """Start control plane and all node agents."""
-        ...
+        # Start control plane
+        self._control_plane = ControlPlane(...)
+        self._control_plane.start()
 
-    async def stop(self) -> None:
-        """Stop all components."""
-        ...
+        for node in self.config.nodes:
+            services = self.config.get_services_for_node(node.id)
 
-    def status(self) -> ClusterStatus:
-        """Get cluster status."""
-        ...
+            if node.is_local:
+                # Start local node agent
+                agent = NodeAgent(node, self.config.mqtt)
+                await agent.start()
+                await agent.deploy_services(services)
+                self._local_agents[node.id] = agent
+            else:
+                # Deploy to remote node via SSH
+                deployer = RemoteNodeDeployer(node, self.config.mqtt)
+                await deployer.connect()
+                await deployer.deploy_agent()
+                # Services deployed by remote agent
+                self._remote_deployers[node.id] = deployer
 ```
 
-### Step 5: Node Agent (`src/node_agent.py`)
+## File Changes
 
-```python
-class NodeAgent:
-    """Agent running on each node, collecting metrics and managing containers."""
+| File | Action | Description |
+|------|--------|-------------|
+| `src/config.py` | Update | Add `user` to NodeConfig, `is_local` property |
+| `src/remote.py` | Create | RemoteNodeDeployer for SSH deployment |
+| `src/node_agent.py` | Update | Add `deploy_services()` method |
+| `src/cluster.py` | Update | Handle remote nodes via SSH |
+| `otto.yaml` | Update | Example with remote node |
 
-    def __init__(self, node_config: NodeConfig, mqtt_config: MQTTConfig):
-        self.config = node_config
-        self.mqtt_config = mqtt_config
-        self.docker = DockerManager(node_config.docker_url)
-        self.publisher: MetricsPublisher | None = None
-
-    async def start(self) -> None:
-        """Start the node agent."""
-        ...
-
-    async def stop(self) -> None:
-        """Stop the node agent."""
-        ...
-```
-
-## File Structure
-
-```
-src/
-├── __init__.py
-├── cli.py              # Typer CLI entry point
-├── config.py           # Pydantic config models
-├── cluster.py          # ClusterManager
-├── node_agent.py       # NodeAgent
-├── control_plane.py    # ControlPlane (metrics subscriber + orchestration)
-├── dockerhandler.py    # (existing)
-├── metrics.py          # (existing)
-└── models.py           # (existing)
-```
-
-## MVP Scope (This PR)
-
-1. `otto cluster init` - Parse and validate otto.yaml
-2. `otto cluster start` - Start local control plane + local node agent only
-3. `otto cluster stop` - Stop everything
-4. `otto cluster status` - Basic status output
-
-**Deferred:**
-- Remote node agents (SSH deployment)
-- Service deployment (just metrics for now)
-- Hot reload of config
-
-## Example Usage
+## Workflow
 
 ```bash
-# Create config
-cat > otto.yaml << EOF
+# 1. Ensure otto is installed on Pi
+ssh lolosioann@192.168.2.7 "cd ~/otto && uv sync"
+
+# 2. Configure cluster
+cat > otto.yaml << 'EOF'
 cluster:
-  name: dev-cluster
+  name: home-cluster
 
 mqtt:
-  host: localhost
+  host: 192.168.2.1  # Your PC IP
   port: 1883
 
 nodes:
   - id: local
     host: localhost
-    docker_url: unix:///var/run/docker.sock
 
-services: []
+  - id: rpi-01
+    host: 192.168.2.7
+    user: lolosioann
+
+services:
+  - name: test-nginx
+    image: nginx:alpine
+    node: rpi-01
+    ports:
+      - "8080:80"
 EOF
 
-# Initialize
+# 3. Initialize and start
 otto cluster init
-
-# Start
 otto cluster start
-
-# Check status
-otto cluster status
-
-# Stop
-otto cluster stop
+# This will:
+# - Start control plane locally
+# - Start local node agent
+# - SSH to Pi, start node agent there
+# - Deploy nginx container on Pi
 ```
 
-## Testing
+## Prerequisites
 
-```bash
-# After implementation
-uv run otto cluster init
-uv run otto cluster start
-# In another terminal, check MQTT messages or run subscriber
-uv run otto cluster status
-uv run otto cluster stop
-```
+1. SSH key auth to Pi (no password prompts)
+2. Otto installed on Pi (`~/otto` with `uv sync` done)
+3. MQTT broker accessible from both nodes
+
+## MVP Scope
+
+**Include:**
+- SSH connection to remote nodes
+- Remote node agent startup
+- Basic container deployment (image, command, ports, env)
+
+**Defer:**
+- Volumes
+- Networks
+- Resource limits
+- Health checks
+- Automatic otto installation on remote
 
 ---
 
 ## Unresolved Questions
 
-None - starting with MVP scope.
+None.
 
 ## Plan Summary
 
-Add typer CLI with `otto cluster {init,start,stop,status}` commands. Create config models for otto.yaml parsing. Implement ClusterManager and NodeAgent to orchestrate metrics streaming. MVP focuses on local operation only.
+Add SSH-based remote node deployment. Control plane SSHs into remote nodes, starts node agents, and deploys containers. Config includes `user` field for SSH and docker-compose-style service definitions.
 
 ---
 

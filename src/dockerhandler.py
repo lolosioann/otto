@@ -99,6 +99,8 @@ class DockerManager:
         image: str,
         name: str | None = None,
         command: str | list[str] | None = None,
+        ports: list[str] | None = None,
+        environment: dict[str, str] | None = None,
         detach: bool = True,
     ) -> str:
         """Create and start a new container.
@@ -111,6 +113,10 @@ class DockerManager:
             The name for the container.
         command : str or list[str], optional
             Command to run in the container. Required for imported images.
+        ports : list[str], optional
+            Port mappings in "host:container" format (e.g., ["8080:80"]).
+        environment : dict[str, str], optional
+            Environment variables for the container.
         detach : bool
             Whether to start the container (default: True).
 
@@ -128,11 +134,38 @@ class DockerManager:
                 await self.pull_image(image)
 
             config: dict = {"Image": image}
+            host_config: dict = {}
+
             if command:
                 if isinstance(command, str):
                     config["Cmd"] = command.split()
                 else:
                     config["Cmd"] = command
+
+            if environment:
+                config["Env"] = [f"{k}={v}" for k, v in environment.items()]
+
+            if ports:
+                exposed_ports = {}
+                port_bindings = {}
+                for port_mapping in ports:
+                    if ":" in port_mapping:
+                        host_port, container_port = port_mapping.split(":", 1)
+                        # Ensure container port has protocol
+                        if "/" not in container_port:
+                            container_port = f"{container_port}/tcp"
+                        exposed_ports[container_port] = {}
+                        port_bindings[container_port] = [{"HostPort": host_port}]
+                    else:
+                        container_port = f"{port_mapping}/tcp"
+                        exposed_ports[container_port] = {}
+
+                config["ExposedPorts"] = exposed_ports
+                host_config["PortBindings"] = port_bindings
+
+            if host_config:
+                config["HostConfig"] = host_config
+
             container = await self.docker.containers.create_or_replace(
                 name=name or image.replace(":", "_").replace("/", "_"),
                 config=config,

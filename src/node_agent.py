@@ -8,7 +8,7 @@ import asyncio
 from commlib.node import Node
 from commlib.transports.mqtt import ConnectionParameters
 
-from src.config import MQTTConfig, NodeConfig
+from src.config import MQTTConfig, NodeConfig, ServiceConfig
 from src.dockerhandler import DockerManager
 from src.metrics import MetricsCollector, MetricsPublisher
 from src.models import ContainerMetricsBatch, NodeMetrics
@@ -121,6 +121,82 @@ class NodeAgent:
     def is_running(self) -> bool:
         """Check if the agent is running."""
         return self._running
+
+    async def deploy_services(self, services: list[ServiceConfig]) -> None:
+        """Deploy containers for services assigned to this node.
+
+        Parameters
+        ----------
+        services : list[ServiceConfig]
+            Services to deploy on this node.
+        """
+        if self._docker is None:
+            raise RuntimeError("Node agent not started. Call start() first.")
+
+        for service in services:
+            await self._deploy_service(service)
+
+    async def _deploy_service(self, service: ServiceConfig) -> None:
+        """Deploy a single service container.
+
+        Parameters
+        ----------
+        service : ServiceConfig
+            Service configuration.
+        """
+        if self._docker is None:
+            return
+
+        print(f"[{self.node_id}] Deploying service: {service.name}")
+
+        # Check if container already exists
+        containers = await self._docker.get_containers()
+        existing = None
+        for c in containers:
+            info = await self._docker.get_container_info(c.id)
+            name = info.get("Name", "").lstrip("/")
+            if name == service.name:
+                existing = c
+                break
+
+        if existing:
+            print(f"[{self.node_id}] Service {service.name} already running")
+            return
+
+        # Pull image if needed and create container
+        try:
+            await self._docker.pull_image(service.image)
+        except Exception as e:
+            print(f"[{self.node_id}] Warning: Could not pull image: {e}")
+
+        # Build container config
+        container_id = await self._create_service_container(service)
+        print(f"[{self.node_id}] Service {service.name} started: {container_id[:12]}")
+
+    async def _create_service_container(self, service: ServiceConfig) -> str:
+        """Create and start a container for a service.
+
+        Parameters
+        ----------
+        service : ServiceConfig
+            Service configuration.
+
+        Returns
+        -------
+        str
+            Container ID.
+        """
+        if self._docker is None:
+            raise RuntimeError("Docker not connected")
+
+        container_id = await self._docker.create_container(
+            image=service.image,
+            name=service.name,
+            command=service.command,
+            ports=service.ports if service.ports else None,
+            environment=service.environment if service.environment else None,
+        )
+        return container_id
 
 
 async def run_node_agent(

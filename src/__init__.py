@@ -21,6 +21,7 @@ from src.dockerhandler import DockerManager
 from src.metrics import MetricsCollector, MetricsPublisher
 from src.models import ContainerMetrics, ContainerMetricsBatch, NodeMetrics
 from src.node_agent import NodeAgent
+from src.remote import RemoteNodeDeployer
 
 __all__ = [
     # Config
@@ -34,6 +35,7 @@ __all__ = [
     "ClusterState",
     "ControlPlane",
     "NodeAgent",
+    "RemoteNodeDeployer",
     # Docker
     "DockerManager",
     "DockerHandlerServer",
