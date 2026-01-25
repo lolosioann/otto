@@ -1,212 +1,294 @@
-# Plan: Real-Time Metrics Streaming
+# Plan: CLI Interface for Otto Cluster Management
 
 ## Goal
 
-Stream Docker container stats and node resource metrics from RPi node agent to central control plane via MQTT pub/sub.
+Create a Docker-like CLI for managing Otto clusters with commands like:
+- `otto cluster init` - Initialize cluster from config file
+- `otto cluster start` - Start the cluster (control plane + node agents)
+- `otto cluster stop` - Stop the cluster
+- `otto cluster status` - Show cluster status
+
+## Config File Format (`otto.yaml`)
+
+```yaml
+cluster:
+  name: my-cluster
+
+mqtt:
+  host: localhost
+  port: 1883
+
+nodes:
+  - id: rpi-01
+    host: 192.168.2.7
+    docker_url: unix:///var/run/docker.sock  # Local to that node
+
+  - id: local
+    host: localhost
+    docker_url: unix:///var/run/docker.sock
+
+services:
+  - name: test-nginx
+    image: nginx:alpine
+    node: rpi-01
+    ports:
+      - "8080:80"
+
+  - name: test-redis
+    image: redis:alpine
+    node: local
+```
+
+## CLI Structure
+
+```
+otto
+├── cluster
+│   ├── init      # Read otto.yaml, validate, save state
+│   ├── start     # Start control plane + node agents
+│   ├── stop      # Stop everything
+│   └── status    # Show cluster state
+└── node
+    ├── list      # List nodes
+    └── metrics   # Show node metrics (future)
+```
 
 ## Architecture
 
 ```
-RPi Node                                    Control Plane
-┌────────────────────────┐                 ┌────────────────────────┐
-│  MetricsCollector      │                 │  MetricsSubscriber     │
-│  ├─ psutil (node)      │                 │  ├─ on_node_metrics()  │
-│  └─ Docker stats       │                 │  └─ on_container_metrics()
-│           │            │                 │           ▲            │
-│           ▼            │                 │           │            │
-│  MetricsPublisher      │   MQTT topics   │   subscribe to topics  │
-│  └─ publish every Ns   │ ──────────────► │                        │
-└────────────────────────┘                 └────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                         otto cluster start                       │
+└─────────────────────────────────────────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      Control Plane (local)                       │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  │
+│  │ MetricsSubscriber│  │ ClusterManager  │  │  ServiceManager │  │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                               │ MQTT
+                               ▼
+┌──────────────────────┐      ┌──────────────────────┐
+│   Node Agent (rpi-01) │      │   Node Agent (local)  │
+│  ┌────────────────┐  │      │  ┌────────────────┐   │
+│  │MetricsPublisher│  │      │  │MetricsPublisher│   │
+│  │ DockerManager  │  │      │  │ DockerManager  │   │
+│  └────────────────┘  │      │  └────────────────┘   │
+└──────────────────────┘      └──────────────────────┘
 ```
-
-## MQTT Topics
-
-- `otto/nodes/{node_id}/metrics/node` - Node-level metrics (CPU, RAM, disk, network)
-- `otto/nodes/{node_id}/metrics/containers` - All container metrics for this node
 
 ## Implementation Steps
 
-### Step 1: Pydantic Models (`src/models.py`)
+### Step 1: Add Dependencies
 
-```python
-from pydantic import BaseModel
-from datetime import datetime
+```toml
+# pyproject.toml
+dependencies = [
+    ...
+    "typer>=0.9.0",
+    "rich>=13.0.0",  # For pretty output (typer dependency)
+    "pyyaml>=6.0.0",
+]
 
-class NodeMetrics(BaseModel):
-    """Node-level resource metrics."""
-    node_id: str
-    timestamp: datetime
-    cpu_percent: float          # 0-100
-    memory_percent: float       # 0-100
-    memory_used_mb: float
-    memory_total_mb: float
-    disk_percent: float         # 0-100
-    disk_used_gb: float
-    disk_total_gb: float
-    network_bytes_sent: int
-    network_bytes_recv: int
-
-class ContainerMetrics(BaseModel):
-    """Single container metrics."""
-    container_id: str
-    container_name: str
-    cpu_percent: float
-    memory_percent: float
-    memory_usage_mb: float
-    memory_limit_mb: float
-    network_rx_bytes: int
-    network_tx_bytes: int
-    block_read_bytes: int
-    block_write_bytes: int
-
-class ContainerMetricsBatch(BaseModel):
-    """Batch of container metrics from a node."""
-    node_id: str
-    timestamp: datetime
-    containers: list[ContainerMetrics]
+[project.scripts]
+otto = "src.cli:app"
 ```
 
-### Step 2: Metrics Collector (`src/metrics.py`)
+### Step 2: Config Models (`src/config.py`)
 
 ```python
-class MetricsCollector:
-    """Collects node and container metrics."""
+from pydantic import BaseModel, Field
+from pydantic_settings import BaseSettings
 
-    def __init__(self, node_id: str, docker: DockerManager):
-        self.node_id = node_id
-        self.docker = docker
+class MQTTConfig(BaseModel):
+    host: str = "localhost"
+    port: int = 1883
 
-    async def collect_node_metrics(self) -> NodeMetrics:
-        """Collect node-level metrics using psutil."""
-        # psutil.cpu_percent(), psutil.virtual_memory(), etc.
-        ...
+class NodeConfig(BaseModel):
+    id: str
+    host: str
+    docker_url: str = "unix:///var/run/docker.sock"
 
-    async def collect_container_metrics(self) -> ContainerMetricsBatch:
-        """Collect metrics for all running containers."""
-        # Use docker.get_containers() + docker.get_container_stats()
+class ServiceConfig(BaseModel):
+    name: str
+    image: str
+    node: str
+    command: str | None = None
+    ports: list[str] = Field(default_factory=list)
+    environment: dict[str, str] = Field(default_factory=dict)
+
+class ClusterConfig(BaseModel):
+    name: str = "default"
+
+class OttoConfig(BaseModel):
+    cluster: ClusterConfig = Field(default_factory=ClusterConfig)
+    mqtt: MQTTConfig = Field(default_factory=MQTTConfig)
+    nodes: list[NodeConfig] = Field(default_factory=list)
+    services: list[ServiceConfig] = Field(default_factory=list)
+
+    @classmethod
+    def from_yaml(cls, path: str) -> "OttoConfig":
         ...
 ```
 
-### Step 3: Metrics Publisher (`src/metrics.py`)
+### Step 3: CLI Entry Point (`src/cli.py`)
 
 ```python
-class MetricsPublisher:
-    """Publishes metrics to MQTT at regular intervals."""
+import typer
 
-    def __init__(
-        self,
-        collector: MetricsCollector,
-        node: Node,  # commlib-py Node
-        interval_seconds: float = 5.0,
-    ):
-        self.collector = collector
-        self.node = node
-        self.interval = interval_seconds
-        self._running = False
+app = typer.Typer(help="Otto - Container orchestration for edge computing")
+cluster_app = typer.Typer(help="Cluster management commands")
+app.add_typer(cluster_app, name="cluster")
+
+@cluster_app.command("init")
+def cluster_init(
+    config: str = typer.Option("otto.yaml", "--config", "-c", help="Config file path")
+):
+    """Initialize cluster from config file."""
+    ...
+
+@cluster_app.command("start")
+def cluster_start():
+    """Start the cluster."""
+    ...
+
+@cluster_app.command("stop")
+def cluster_stop():
+    """Stop the cluster."""
+    ...
+
+@cluster_app.command("status")
+def cluster_status():
+    """Show cluster status."""
+    ...
+```
+
+### Step 4: Cluster Manager (`src/cluster.py`)
+
+```python
+class ClusterManager:
+    """Manages the Otto cluster lifecycle."""
+
+    def __init__(self, config: OttoConfig):
+        self.config = config
+        self._node_agents: dict[str, NodeAgent] = {}
+        self._control_plane: ControlPlane | None = None
 
     async def start(self) -> None:
-        """Start publishing loop."""
-        self._running = True
-        while self._running:
-            node_metrics = await self.collector.collect_node_metrics()
-            container_metrics = await self.collector.collect_container_metrics()
-
-            # Publish to MQTT (you implement this part)
-            self._publish_node_metrics(node_metrics)
-            self._publish_container_metrics(container_metrics)
-
-            await asyncio.sleep(self.interval)
-
-    def stop(self) -> None:
-        """Stop publishing loop."""
-        self._running = False
-
-    def _publish_node_metrics(self, metrics: NodeMetrics) -> None:
-        """Publish node metrics to MQTT topic."""
-        # commlib-py publisher - you fill in
-        topic = f"otto/nodes/{self.collector.node_id}/metrics/node"
+        """Start control plane and all node agents."""
         ...
 
-    def _publish_container_metrics(self, metrics: ContainerMetricsBatch) -> None:
-        """Publish container metrics to MQTT topic."""
-        topic = f"otto/nodes/{self.collector.node_id}/metrics/containers"
+    async def stop(self) -> None:
+        """Stop all components."""
+        ...
+
+    def status(self) -> ClusterStatus:
+        """Get cluster status."""
         ...
 ```
 
-### Step 4: Control Plane Subscriber (separate file or test script)
+### Step 5: Node Agent (`src/node_agent.py`)
 
 ```python
-class MetricsSubscriber:
-    """Subscribes to metrics from all nodes."""
+class NodeAgent:
+    """Agent running on each node, collecting metrics and managing containers."""
 
-    def __init__(self, node: Node):
-        self.node = node
-        self._latest_metrics: dict[str, NodeMetrics] = {}
+    def __init__(self, node_config: NodeConfig, mqtt_config: MQTTConfig):
+        self.config = node_config
+        self.mqtt_config = mqtt_config
+        self.docker = DockerManager(node_config.docker_url)
+        self.publisher: MetricsPublisher | None = None
 
-    def start(self) -> None:
-        """Subscribe to metrics topics."""
-        # Subscribe to otto/nodes/+/metrics/node
-        # Subscribe to otto/nodes/+/metrics/containers
+    async def start(self) -> None:
+        """Start the node agent."""
         ...
 
-    def on_node_metrics(self, msg: NodeMetrics) -> None:
-        """Handle incoming node metrics."""
-        print(f"[{msg.node_id}] CPU: {msg.cpu_percent}% MEM: {msg.memory_percent}%")
-        self._latest_metrics[msg.node_id] = msg
-
-    def on_container_metrics(self, msg: ContainerMetricsBatch) -> None:
-        """Handle incoming container metrics."""
-        for c in msg.containers:
-            print(f"  [{c.container_name}] CPU: {c.cpu_percent}% MEM: {c.memory_usage_mb}MB")
+    async def stop(self) -> None:
+        """Stop the node agent."""
+        ...
 ```
 
-## File Changes
+## File Structure
 
-| File | Action | Description |
-|------|--------|-------------|
-| `src/models.py` | Create | Pydantic models for metrics |
-| `src/metrics.py` | Create | MetricsCollector + MetricsPublisher |
-| `src/__init__.py` | Update | Export new classes |
-| `test_scripts/test_metrics_publisher.py` | Create | Test script for RPi |
-| `test_scripts/test_metrics_subscriber.py` | Create | Test script for control plane |
+```
+src/
+├── __init__.py
+├── cli.py              # Typer CLI entry point
+├── config.py           # Pydantic config models
+├── cluster.py          # ClusterManager
+├── node_agent.py       # NodeAgent
+├── control_plane.py    # ControlPlane (metrics subscriber + orchestration)
+├── dockerhandler.py    # (existing)
+├── metrics.py          # (existing)
+└── models.py           # (existing)
+```
 
-## Your Part (commlib-py)
+## MVP Scope (This PR)
 
-You'll need to fill in:
-1. `MetricsPublisher._publish_node_metrics()` - publish to topic
-2. `MetricsPublisher._publish_container_metrics()` - publish to topic
-3. `MetricsSubscriber.start()` - subscribe with wildcard topics
+1. `otto cluster init` - Parse and validate otto.yaml
+2. `otto cluster start` - Start local control plane + local node agent only
+3. `otto cluster stop` - Stop everything
+4. `otto cluster status` - Basic status output
 
-I'll implement:
-1. Pydantic models
-2. psutil collection logic
-3. Docker stats parsing
-4. Overall class structure
+**Deferred:**
+- Remote node agents (SSH deployment)
+- Service deployment (just metrics for now)
+- Hot reload of config
 
-## Docker Stats Parsing
+## Example Usage
 
-Raw Docker stats need parsing. Key fields:
-- `cpu_stats.cpu_usage.total_usage` / `cpu_stats.system_cpu_usage` → CPU %
-- `memory_stats.usage` / `memory_stats.limit` → Memory
-- `networks.eth0.rx_bytes`, `tx_bytes` → Network
-- `blkio_stats` → Block I/O
+```bash
+# Create config
+cat > otto.yaml << EOF
+cluster:
+  name: dev-cluster
+
+mqtt:
+  host: localhost
+  port: 1883
+
+nodes:
+  - id: local
+    host: localhost
+    docker_url: unix:///var/run/docker.sock
+
+services: []
+EOF
+
+# Initialize
+otto cluster init
+
+# Start
+otto cluster start
+
+# Check status
+otto cluster status
+
+# Stop
+otto cluster stop
+```
 
 ## Testing
 
-1. Start MQTT broker: `docker compose up -d mqtt`
-2. Run publisher on RPi: `python test_scripts/test_metrics_publisher.py`
-3. Run subscriber on PC: `python test_scripts/test_metrics_subscriber.py`
-4. Verify metrics flow
+```bash
+# After implementation
+uv run otto cluster init
+uv run otto cluster start
+# In another terminal, check MQTT messages or run subscriber
+uv run otto cluster status
+uv run otto cluster stop
+```
 
 ---
 
 ## Unresolved Questions
 
-None - scope is clear.
+None - starting with MVP scope.
 
 ## Plan Summary
 
-Create Pydantic models for metrics, implement collector using psutil + Docker stats, create publisher/subscriber classes. User implements commlib-py pub/sub specifics.
+Add typer CLI with `otto cluster {init,start,stop,status}` commands. Create config models for otto.yaml parsing. Implement ClusterManager and NodeAgent to orchestrate metrics streaming. MVP focuses on local operation only.
 
 ---
 

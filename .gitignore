@@ -22,3 +22,4 @@ htmlcov/
 # Documentation
 docs/_build/
 mqtt5/
+.otto/

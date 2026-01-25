@@ -1,0 +1,13 @@
+cluster:
+  name: dev-cluster
+
+mqtt:
+  host: localhost
+  port: 1883
+
+nodes:
+  - id: local
+    host: localhost
+    docker_url: unix:///var/run/docker.sock
+
+services: []
