@@ -63,11 +63,10 @@ class RemoteNodeDeployer:
         services_json = "[]"
         if services:
             services_data = [s.model_dump() for s in services]
-            services_json = json.dumps(services_data).replace('"', '\\"')
+            services_json = json.dumps(services_data)
 
         # Build the Python script to run
-        script = f"""
-import asyncio
+        script = f'''import asyncio
 import json
 from src.node_agent import NodeAgent
 from src.config import NodeConfig, MQTTConfig, ServiceConfig
@@ -83,7 +82,7 @@ async def main():
         port={self.mqtt.port},
     )
 
-    services_data = json.loads("{services_json}")
+    services_data = json.loads("""{services_json}""")
     services = [ServiceConfig.model_validate(s) for s in services_data]
 
     agent = NodeAgent(node_config, mqtt_config)
@@ -103,9 +102,13 @@ async def main():
         await agent.stop()
 
 asyncio.run(main())
-"""
+'''
 
-        cmd = f'cd {self.otto_path} && uv run python -c "{script}"'
+        # Write script to temp file and execute
+        script_path = f"{self.otto_path}/.otto_agent_{self.node.id}.py"
+        await self._ssh.run(f"cat > {script_path} << 'OTTOSCRIPT'\n{script}\nOTTOSCRIPT")
+
+        cmd = f"cd {self.otto_path} && uv run python {script_path}"
 
         self._agent_process = await self._ssh.create_process(
             cmd,
